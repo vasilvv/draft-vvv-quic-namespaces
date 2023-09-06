@@ -18,7 +18,7 @@ venue:
   type: Working Group
   mail: quic@ietf.org
   arch: https://example.com/WG
-  github: https://github.com/vasilvv/draft-vvv-quic-namespaces
+  github: vasilvv/draft-vvv-quic-namespaces
   #latest: https://example.com/LATEST
 
 author:
