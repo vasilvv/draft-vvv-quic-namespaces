@@ -4,8 +4,8 @@
 
 QUIC Working Group                                           V. Vasiliev
 Internet-Draft                                                    Google
-Intended status: Informational                            21 August 2023
-Expires: 22 February 2024
+Intended status: Informational                          6 September 2023
+Expires: 9 March 2024
 
 
                        Stream Namespaces for QUIC
@@ -30,8 +30,7 @@ About This Document
    https://www.ietf.org/mailman/listinfo/quic/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/https://github.com/vasilvv/draft-vvv-quic-
-   namespaces.
+   https://github.com/vasilvv/draft-vvv-quic-namespaces.
 
 Status of This Memo
 
@@ -48,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 February 2024.
+   This Internet-Draft will expire on 9 March 2024.
 
 Copyright Notice
 
