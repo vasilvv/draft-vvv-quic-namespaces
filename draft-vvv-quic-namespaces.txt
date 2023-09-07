@@ -1,0 +1,217 @@
+
+
+
+
+QUIC Working Group                                           V. Vasiliev
+Internet-Draft                                                    Google
+Intended status: Informational                          6 September 2023
+Expires: 9 March 2024
+
+
+                       Stream Namespaces for QUIC
+                    draft-vvv-quic-namespaces-latest
+
+Abstract
+
+   QUIC Stream Namespaces provide an extension to the QUIC protocol that
+   enables multiplexing multiple logical groups of streams within the
+   same connection, while providing flow control isolation.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-vvv-quic-namespaces/.
+
+   Discussion of this document takes place on the quic Working Group
+   mailing list (mailto:quic@ietf.org), which is archived at
+   https://example.com/WG.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/quic/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/vasilvv/draft-vvv-quic-namespaces.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 9 March 2024.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Namespaces
+   4.  Frames
+     4.1.  NS frame
+     4.2.  CLOSE_NAMESPACE frame
+   5.  Security Considerations
+   6.  IANA Considerations
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   QUIC [RFC9000] provides an ordered bytestream abstraction called
+   streams.  Streams are subject to various flow control mechanisms that
+   allow a network endpoint to control how much resources a peer is
+   allowed to consume.  Some of the flow control mechanisms are scoped
+   to a single stream; others are global to the entire connection.  The
+   connection-level flow control mechanisms are a good fit in cases when
+   all of the streams originate from the same entity; however, in cases
+   when multiple logical entities share the same connection, a single
+   global limit may lead to one entity starving another.  This document
+   provides a mechanism by which a single QUIC connection can have
+   multiple namespaces, each with its own resource limits for streams.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Namespaces
+
+   A QUIC namespace is a 62-bit unique ID number.  In the initial state,
+   every namespace ID is assumed to exist, but have a MAX_STREAMS number
+   associated with it set to 0 for all types of streams, and a MAX_DATA
+   value of 0 in both directions.  A peer opens a namespace by sending a
+   combination of MAX_DATA and MAX_STREAMS frames for that namespace.
+   The recepient may response with either its own MAX_DATA and
+   MAX_STREAMS, confirming the response, or it may close the namespace.
+   Frames that do not have a namespace ID associated with them are said
+   to be a part of _the default namespace_.
+
+   Note that there is no way to set a namespace-specific
+   initial_max_stream_data parameters; those remain connection-global.
+
+4.  Frames
+
+4.1.  NS frame
+
+   An NS frame (frame type=0x29c5) is a frame that alters the meaning of
+   the frame that comes immediately after it.  If the subsequent frame
+   has a stream ID in it, that ID refers to the stream with the
+   corresponding ID in the specified namespace.  If the subsequent frame
+   alters connection-global flow control limits, those limits are
+   altered for the namespace in question, instead of the default
+   namespace.
+
+   NS Frame {
+     Type (i) = 0x29c5,
+     Namespace ID (i),
+   }
+
+                         Figure 1: NS Frame Format
+
+   The following frames are allowed to follow the NS frame: STREAM,
+   RESET_STREAM, STOP_SENDING, MAX_DATA, MAX_STREAM_DATA, MAX_STREAMS,
+   DATA_BLOCKED, STREAM_DATA_BLOCKED, STREAMS_BLOCKED.  Extensions that
+   define their own frames can define their own semantics of interacting
+   with namespaces.  If a frame that is not listed above and does not
+   have extension semantics defined for it is prefixed with an NS frame,
+   the recepient MUST close the connection with a PROTOCOL_VIOLATION
+   error code.  Same applies to an NS frame that is not followed by
+   anything.
+
+   Note that this intentionally does not define NS prefix for the
+   DATAGRAM frames [RFC9221], as datagrams already have pre-defined
+   mechanisms for multiplexing (such as [RFC9297]) that may conflict
+   with QUIC stream namespaces, and there is no technical advantage of
+   using an NS frame with datagrams over doing multiplexing within the
+   datagram payload.
+
+4.2.  CLOSE_NAMESPACE frame
+
+   A CLOSE_NAMESPACE frame indicates to the peer that the sender will
+   not process any further data received for a given namespace.  The
+   sender can discard all of the state related to the namespace after
+   sending this frame.
+
+   CLOSE_NAMESPACE Frame {
+     Type (i) = 0x29c6,
+     Namespace ID (i),
+   }
+
+                   Figure 2: CLOSE_NAMESPACE Frame Format
+
+5.  Security Considerations
+
+   TODO Security
+
+   TODO: discuss the issue where the peer has to remember flow control
+   limits for arbitrary unexpected namespaces.
+
+6.  IANA Considerations
+
+   TODO: add a transport parameter to negotiate this feature.
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", RFC 9221,
+              DOI 10.17487/RFC9221, March 2022,
+              <https://www.rfc-editor.org/rfc/rfc9221>.
+
+7.2.  Informative References
+
+   [RFC9297]  Schinazi, D. and L. Pardue, "HTTP Datagrams and the
+              Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
+              2022, <https://www.rfc-editor.org/rfc/rfc9297>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Victor Vasiliev
+   Google
+   Email: vasilvv@google.com

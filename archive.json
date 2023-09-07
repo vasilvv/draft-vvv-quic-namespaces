@@ -1,0 +1,108 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2023-09-07T00:03:42.588764+00:00",
+  "repo": "vasilvv/draft-vvv-quic-namespaces",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDOKCrgx85wO3AX",
+      "title": "Recursive usage",
+      "url": "https://github.com/vasilvv/draft-vvv-quic-namespaces/issues/2",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This doesn't necessarily create a flat partitioning of the stream space, it creates a tree.  Consider the difference between NS+STREAM and NS+NS+STREAM...\r\n\r\nI'm not saying that this is a *good* idea, but I wanted to put it out there.  Maybe needs both a MAX_NS and MAX_NS_DEPTH transport parameters.",
+      "createdAt": "2023-09-06T00:35:58Z",
+      "updatedAt": "2023-09-06T17:04:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "vasilvv",
+          "authorAssociation": "OWNER",
+          "body": "This is currently technically not allowed, since the draft explicitly enumerates the frames that can be prefixed via NS, and NS is not one of them.  Nesting those is somewhat annoying, since that would change stream IDs from being fixed length to being a path of arbitrary length.",
+          "createdAt": "2023-09-06T17:04:00Z",
+          "updatedAt": "2023-09-06T17:04:00Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOKCrgx85ZoDnL",
+      "title": "Don't double-up on GitHub",
+      "url": "https://github.com/vasilvv/draft-vvv-quic-namespaces/pull/1",
+      "state": "MERGED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This displays as \"https://github.com/https://github.com/vasilvv/draft-vvv-quic-namespaces\"  Consider instead using `make update-venue` for this one.",
+      "createdAt": "2023-09-06T00:34:09Z",
+      "updatedAt": "2023-09-06T17:04:32Z",
+      "baseRepository": "vasilvv/draft-vvv-quic-namespaces",
+      "baseRefName": "main",
+      "baseRefOid": "569a922b82bebdb1b27feffc4cc85c6f0834ea19",
+      "headRepository": "martinthomson/draft-vvv-quic-namespaces",
+      "headRefName": "patch-1",
+      "headRefOid": "9aee73265324ad684bf0fb49eefa18c275ee3597",
+      "closedAt": "2023-09-06T17:04:32Z",
+      "mergedAt": "2023-09-06T17:04:32Z",
+      "mergedBy": "vasilvv",
+      "mergeCommit": {
+        "oid": "356133e316a34a1e6b3120f0e5bc55da39451ce7"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
